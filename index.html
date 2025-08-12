@@ -213,7 +213,7 @@
 
   // ——— Helpers: regex escape and case preservation ———
   // Correctly escape special regex characters in the source term
-  const esc = (s) => s.replace(/[.*+?^${}()|[\]\]/g, '\$&');
+  const esc = (s) => s.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
   function applyCase(source, replacement){
     if (source.toUpperCase() === source) return replacement.toUpperCase();
     if (source[0] && source[0] === source[0].toUpperCase() && source.slice(1) === source.slice(1).toLowerCase())
