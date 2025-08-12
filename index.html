@@ -212,6 +212,7 @@
   const shareBtn = document.getElementById('shareBtn');
 
   // ——— Helpers: regex escape and case preservation ———
+  // Correctly escape special regex characters in the source term
   const esc = (s) => s.replace(/[.*+?^${}()|[\]\]/g, '\$&');
   function applyCase(source, replacement){
     if (source.toUpperCase() === source) return replacement.toUpperCase();
@@ -232,15 +233,16 @@
     let out = text;
 
     // Use markers to wrap changes, replaced after all substitutions
-    const OPEN = '';
-    const CLOSE = '';
+    const OPEN = '\uE000';
+    const CLOSE = '\uE001';
 
     for (const p of pairs){
       const src = direction === 'plain→jargon' ? p.plain : p.jargon;
       const dst = direction === 'plain→jargon' ? p.jargon : p.plain;
       if (!src || !dst) continue;
 
-      const rx = new RegExp(`\b${esc(src)}\b`, 'gi');
+      // Word boundaries must be escaped in the JS string
+      const rx = new RegExp(`\\b${esc(src)}\\b`, 'gi');
       out = out.replace(rx, (m)=>{
         const repl = applyCase(m, dst);
         changed.push({from:m, to:repl});
@@ -248,8 +250,11 @@
       });
     }
 
-    return { 
-      text: out.replaceAll(OPEN, hlToggle.checked ? '<mark>' : '').replaceAll(CLOSE, hlToggle.checked ? '</mark>' : ''),
+    // Replace markers with <mark> tags when highlighting is enabled
+    const openTag = hlToggle.checked ? '<mark>' : '';
+    const closeTag = hlToggle.checked ? '</mark>' : '';
+    return {
+      text: out.split(OPEN).join(openTag).split(CLOSE).join(closeTag),
       changes: changed
     };
   }
@@ -292,11 +297,8 @@
       if (!uniq.has(k)) uniq.set(k, {from:c.from, to:c.to, n:0});
       uniq.get(k).n++;
     }
-    const lines = [...uniq.values()].map(x=>`• "${x.from}" → "${x.to}"  (×${x.n})`).join('
-');
-    alert('Replacements applied:
-
-' + lines);
+    const lines = [...uniq.values()].map(x=>`• "${x.from}" → "${x.to}"  (×${x.n})`).join('\n');
+    alert('Replacements applied:\n\n' + lines);
   });
 
   shareBtn.addEventListener('click', ()=>{
