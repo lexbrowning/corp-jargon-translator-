@@ -292,8 +292,7 @@
       if (!uniq.has(k)) uniq.set(k, {from:c.from, to:c.to, n:0});
       uniq.get(k).n++;
     }
-    const lines = [...uniq.values()].map(x=>`• "${x.from}" → "${x.to}"  (×${x.n})`).join('
-');
+    const lines = [...uniq.values()].map(x=>`• "${x.from}" → "${x.to}"  (×${x.n})`).join('\n');
     alert('Replacements applied:
 
 ' + lines);
@@ -324,6 +323,6 @@
 
   // Init
   loadFromHash();
-  </script>
+</script>
 </body>
 </html>
