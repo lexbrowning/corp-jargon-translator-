@@ -212,7 +212,7 @@
   const shareBtn = document.getElementById('shareBtn');
 
   // ——— Helpers: regex escape and case preservation ———
-  const esc = s => s.replace(/[.*+?^${}()|[\]\]/g, '\$&');
+  const esc = (s) => s.replace(/[.*+?^${}()|[\]\]/g, '\$&');
   function applyCase(source, replacement){
     if (source.toUpperCase() === source) return replacement.toUpperCase();
     if (source[0] && source[0] === source[0].toUpperCase() && source.slice(1) === source.slice(1).toLowerCase())
@@ -292,7 +292,8 @@
       if (!uniq.has(k)) uniq.set(k, {from:c.from, to:c.to, n:0});
       uniq.get(k).n++;
     }
-    const lines = [...uniq.values()].map(x=>`• "${x.from}" → "${x.to}"  (×${x.n})`).join('\n');
+    const lines = [...uniq.values()].map(x=>`• "${x.from}" → "${x.to}"  (×${x.n})`).join('
+');
     alert('Replacements applied:
 
 ' + lines);
