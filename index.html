@@ -4,7 +4,7 @@
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1" />
   <title>Corporate Jargon Translator</title>
-  <meta name="description" content="Translate between plain language and corporate jargon, in both directions. Add your own terms and share results." />
+  <meta name="description" content="Translate between plain language and corporate jargon in both directions. Read‑only, no user edits." />
   <style>
     :root{
       --bg:#0b1020;            /* deep navy */
@@ -14,16 +14,13 @@
       --accent:#6aa0ff;        /* primary */
       --accent-2:#89d185;      /* success */
       --warn:#ffb454;          /* warning */
-      --danger:#ff7a7a;        /* danger */
       --mark:#2a3a66;          /* highlight bg */
       --shadow:0 10px 30px rgba(0,0,0,.35);
       --radius:16px;
     }
     *{box-sizing:border-box}
     html,body{height:100%}
-    body{
-      margin:0; font-family:system-ui,-apple-system,Segoe UI,Roboto,Ubuntu,"Helvetica Neue",Arial; background:linear-gradient(180deg,#0b1020,#0a0e1b 40%,#0b1020 100%); color:var(--text);
-    }
+    body{ margin:0; font-family:system-ui,-apple-system,Segoe UI,Roboto,Ubuntu,"Helvetica Neue",Arial; background:linear-gradient(180deg,#0b1020,#0a0e1b 40%,#0b1020 100%); color:var(--text); }
     header{padding:28px 20px 0; text-align:center}
     h1{margin:0 0 4px; font-size:clamp(22px, 2.2vw + 14px, 36px); letter-spacing:.3px}
     .sub{color:var(--muted); margin:0 0 22px; font-size:clamp(12px, .6vw + 10px, 15px)}
@@ -57,13 +54,6 @@
     .row{ display:flex; flex-wrap:wrap; align-items:center; gap:10px }
     .note{ color:var(--muted); font-size:13px }
 
-    details{ background:#0f1430; border:1px solid rgba(255,255,255,.12); border-radius:12px; padding:12px 14px; }
-    summary{ cursor:pointer; font-weight:700 }
-    table{ width:100%; border-collapse:collapse; margin-top:8px }
-    th,td{ border-bottom:1px dashed rgba(255,255,255,.12); padding:8px 6px; text-align:left }
-    td small{ color:var(--muted) }
-    input[type="text"]{ width:100%; background:#0f1430; color:var(--text); border:1px solid rgba(255,255,255,.18); border-radius:8px; padding:8px }
-
     .kbd{ font-family:ui-monospace,SFMono-Regular,Menlo,monospace; background:#0f1430; border:1px solid rgba(255,255,255,.18); padding:2px 6px; border-radius:6px }
     footer{ text-align:center; color:var(--muted); font-size:12px; padding:24px }
   </style>
@@ -71,7 +61,7 @@
 <body>
   <header>
     <h1>Corporate Jargon Translator</h1>
-    <p class="sub">Translate between plain language and corporate jargon. Add your own terms, highlight changes, and share a link.</p>
+    <p class="sub">Translate between plain language and corporate jargon. Read‑only mode. No custom terms.</p>
   </header>
 
   <main class="wrap">
@@ -98,7 +88,6 @@
           </div>
           <textarea id="input" placeholder="Type or paste your text..."></textarea>
           <div class="row" style="justify-content:flex-end; margin-top:8px">
-            <button class="btn ghost" id="sampleBtn">Insert sample</button>
             <button class="btn warn" id="clearBtn">Clear</button>
           </div>
         </div>
@@ -115,56 +104,14 @@
       </div>
     </section>
 
-    <section style="height:12px"></section>
-
-    <section class="card" aria-labelledby="dictTitle">
-      <div class="area">
-        <h2 id="dictTitle" style="margin:0 0 6px; font-size:20px">Dictionary</h2>
-        <p class="note" style="margin:0 0 10px">You can add, edit, import, and export the terms below. Replacements are whole-word and case‑insensitive. Longer phrases run before shorter ones.</p>
-
-        <details>
-          <summary>Add a custom pair</summary>
-          <div class="grid" style="margin-top:10px">
-            <div>
-              <label>Plain</label>
-              <input type="text" id="newPlain" placeholder="e.g., get approval">
-            </div>
-            <div>
-              <label>Jargon</label>
-              <input type="text" id="newJargon" placeholder="e.g., get buy-in">
-            </div>
-          </div>
-          <div class="row" style="margin-top:10px; justify-content:flex-end">
-            <button class="btn" id="addPairBtn">Add pair</button>
-          </div>
-        </details>
-
-        <div class="row" style="justify-content:space-between; margin-top:14px">
-          <div class="row" style="gap:8px">
-            <button class="btn" id="exportBtn" title="Download your dictionary as JSON">Export JSON</button>
-            <label class="btn" for="importFile" style="cursor:pointer">Import JSON</label>
-            <input id="importFile" type="file" accept="application/json" style="display:none">
-          </div>
-          <span class="note">Stored locally in your browser</span>
-        </div>
-
-        <div id="dictTableWrap"></div>
-      </div>
-    </section>
-
     <footer>
-      Built for fun. No data leaves your browser.
+      Built for fun. No data leaves your browser. Dictionary is fixed in code.
     </footer>
   </main>
 
   <script>
-  // ——— Utility: local storage helpers ———
-  const storageKey = 'cj_dictionary_v1';
-  const getDict = () => JSON.parse(localStorage.getItem(storageKey) || '[]');
-  const setDict = (arr) => localStorage.setItem(storageKey, JSON.stringify(arr));
-
-  // ——— Default pairs (seeded once) ———
-  const defaultPairs = [
+  // ——— Read‑only dictionary (fixed) ———
+  const DICTIONARY = [
     {plain:"talk in private", jargon:"take this offline"},
     {plain:"talk later", jargon:"circle back"},
     {plain:"quick meeting", jargon:"touch base"},
@@ -253,9 +200,6 @@
     {plain:"help", jargon:"support"}
   ];
 
-  // Seed defaults once
-  if (!localStorage.getItem(storageKey)) setDict(defaultPairs);
-
   // ——— DOM references ———
   const inputEl = document.getElementById('input');
   const outputEl = document.getElementById('output');
@@ -263,19 +207,12 @@
   const copyBtn = document.getElementById('copyBtn');
   const explainBtn = document.getElementById('explainBtn');
   const clearBtn = document.getElementById('clearBtn');
-  const sampleBtn = document.getElementById('sampleBtn');
   const hlToggle = document.getElementById('hlToggle');
   const modeSeg = document.getElementById('modeSeg');
-  const exportBtn = document.getElementById('exportBtn');
-  const importFile = document.getElementById('importFile');
-  const newPlain = document.getElementById('newPlain');
-  const newJargon = document.getElementById('newJargon');
-  const addPairBtn = document.getElementById('addPairBtn');
-  const dictTableWrap = document.getElementById('dictTableWrap');
   const shareBtn = document.getElementById('shareBtn');
 
   // ——— Helpers: regex escape and case preservation ———
-  const esc = s => s.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+  const esc = s => s.replace(/[.*+?^${}()|[\]\]/g, '\$&');
   function applyCase(source, replacement){
     if (source.toUpperCase() === source) return replacement.toUpperCase();
     if (source[0] && source[0] === source[0].toUpperCase() && source.slice(1) === source.slice(1).toLowerCase())
@@ -289,22 +226,21 @@
   }
 
   function translate(text, direction){
-    const dict = getDict();
-    const pairs = sortByLenDesc(dict, direction === 'plain→jargon' ? 'plain' : 'jargon');
+    const pairs = sortByLenDesc(DICTIONARY, direction === 'plain→jargon' ? 'plain' : 'jargon');
 
     let changed = [];
     let out = text;
 
     // Use markers to wrap changes, replaced after all substitutions
-    const OPEN = '\uE000';
-    const CLOSE = '\uE001';
+    const OPEN = '';
+    const CLOSE = '';
 
     for (const p of pairs){
       const src = direction === 'plain→jargon' ? p.plain : p.jargon;
       const dst = direction === 'plain→jargon' ? p.jargon : p.plain;
       if (!src || !dst) continue;
 
-      const rx = new RegExp(`\\b${esc(src)}\\b`, 'gi');
+      const rx = new RegExp(`\b${esc(src)}\b`, 'gi');
       out = out.replace(rx, (m)=>{
         const repl = applyCase(m, dst);
         changed.push({from:m, to:repl});
@@ -346,16 +282,6 @@
 
   clearBtn.addEventListener('click', ()=>{ inputEl.value=''; outputEl.innerHTML=''; });
 
-  sampleBtn.addEventListener('click', ()=>{
-    const m = currentMode();
-    if (m === 'plain→jargon'){
-      inputEl.value = `We need to fix the problem, get approval, and schedule a quick meeting. If we cannot do that this week, let us delay and talk later.`;
-    } else {
-      inputEl.value = `We should socialize the idea to get buy-in, then sync to kick off the pilot. If it is out of scope, we can deprioritize and circle back.`;
-    }
-    run();
-  });
-
   explainBtn.addEventListener('click', ()=>{
     const res = translate(inputEl.value, currentMode());
     if (!res.changes.length){ alert('No replacements were applied.'); return; }
@@ -366,8 +292,11 @@
       if (!uniq.has(k)) uniq.set(k, {from:c.from, to:c.to, n:0});
       uniq.get(k).n++;
     }
-    const lines = [...uniq.values()].map(x=>`• "${x.from}" → "${x.to}"  (×${x.n})`).join('\n');
-    alert('Replacements applied:\n\n' + lines);
+    const lines = [...uniq.values()].map(x=>`• "${x.from}" → "${x.to}"  (×${x.n})`).join('
+');
+    alert('Replacements applied:
+
+' + lines);
   });
 
   shareBtn.addEventListener('click', ()=>{
@@ -379,77 +308,6 @@
     navigator.clipboard.writeText(url).then(()=>{
       shareBtn.textContent = 'Link copied'; setTimeout(()=>shareBtn.textContent='Share', 1200);
     });
-  });
-
-  // ——— Dictionary table ———
-  function renderDict(){
-    const data = getDict();
-    if (!data.length){ dictTableWrap.innerHTML = '<p class="note">No entries yet.</p>'; return; }
-
-    const rows = data.map((p, i)=>`
-      <tr>
-        <td><input data-idx="${i}" data-k="plain" type="text" value="${p.plain || ''}" /></td>
-        <td><input data-idx="${i}" data-k="jargon" type="text" value="${p.jargon || ''}" /></td>
-        <td style="width:1%; white-space:nowrap">
-          <button class="btn" data-act="up" data-idx="${i}" title="Move up">↑</button>
-          <button class="btn" data-act="down" data-idx="${i}" title="Move down">↓</button>
-          <button class="btn warn" data-act="del" data-idx="${i}">Delete</button>
-        </td>
-      </tr>
-    `).join('');
-
-    dictTableWrap.innerHTML = `
-      <table aria-label="Dictionary entries"><thead>
-        <tr><th>Plain</th><th>Jargon</th><th></th></tr>
-      </thead><tbody>${rows}</tbody></table>
-      <p class="note">Order matters. Longer phrases should be above shorter ones to avoid partial replacements.</p>
-    `;
-
-    // Wire inputs and buttons
-    dictTableWrap.querySelectorAll('input').forEach(inp=>{
-      inp.addEventListener('change', ()=>{
-        const idx = +inp.dataset.idx, key = inp.dataset.k; const arr = getDict();
-        arr[idx][key] = inp.value; setDict(arr); run();
-      })
-    });
-    dictTableWrap.querySelectorAll('button').forEach(btn=>{
-      btn.addEventListener('click', ()=>{
-        const act = btn.dataset.act, idx = +btn.dataset.idx; const arr = getDict();
-        if (act === 'del'){ arr.splice(idx,1); }
-        if (act === 'up' && idx>0){ [arr[idx-1], arr[idx]] = [arr[idx], arr[idx-1]]; }
-        if (act === 'down' && idx < arr.length-1){ [arr[idx+1], arr[idx]] = [arr[idx], arr[idx+1]]; }
-        setDict(arr); renderDict(); run();
-      })
-    });
-  }
-
-  addPairBtn.addEventListener('click', ()=>{
-    const a = newPlain.value.trim(); const b = newJargon.value.trim();
-    if (!a || !b) { alert('Please fill both Plain and Jargon.'); return; }
-    const arr = getDict();
-    arr.unshift({plain:a, jargon:b});
-    setDict(arr); newPlain.value=''; newJargon.value=''; renderDict();
-  });
-
-  // ——— Import / Export ———
-  exportBtn.addEventListener('click', ()=>{
-    const blob = new Blob([JSON.stringify(getDict(), null, 2)], {type:'application/json'});
-    const a = document.createElement('a');
-    a.href = URL.createObjectURL(blob);
-    a.download = 'jargon-dictionary.json'; a.click(); URL.revokeObjectURL(a.href);
-  });
-  importFile.addEventListener('change', (e)=>{
-    const f = e.target.files[0]; if (!f) return;
-    const reader = new FileReader();
-    reader.onload = () => {
-      try{ const arr = JSON.parse(reader.result);
-        if (!Array.isArray(arr)) throw new Error('Invalid');
-        setDict(arr); renderDict(); run();
-      } catch{
-        alert('Could not import. Please provide a JSON array of {plain, jargon} objects.');
-      }
-    };
-    reader.readAsText(f);
   });
 
   // ——— Hash load (share links) ———
@@ -465,7 +323,6 @@
   }
 
   // Init
-  renderDict();
   loadFromHash();
   </script>
 </body>
